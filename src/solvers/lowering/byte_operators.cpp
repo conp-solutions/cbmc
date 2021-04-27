@@ -17,6 +17,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/endianness_map.h>
 #include <util/expr_util.h>
 #include <util/namespace.h>
+#include <util/narrow.h>
 #include <util/pointer_offset_size.h>
 #include <util/replace_symbol.h>
 #include <util/simplify_expr.h>
