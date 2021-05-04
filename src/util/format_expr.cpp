@@ -22,6 +22,7 @@ Author: Daniel Kroening, kroening@kroening.com
 #include "invariant.h"
 #include "mathematical_expr.h"
 #include "mp_arith.h"
+#include "prefix.h"
 #include "rational.h"
 #include "rational_tools.h"
 #include "std_code.h"
@@ -189,6 +190,10 @@ static std::ostream &format_rec(std::ostream &os, const constant_exprt &src)
   {
     if(src.is_zero())
       return os << ID_NULL;
+    else if(has_prefix(id2string(src.get_value()), "INVALID-"))
+    {
+      return os << "INVALID-POINTER";
+    }
     else if(src.operands().size() == 1)
     {
       const auto &unary_expr = to_unary_expr(src);
