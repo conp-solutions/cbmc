@@ -120,17 +120,10 @@ TAR = tar
 
 minisat2-download:
 	@echo "Downloading MergeSat (replacing Minisat 2.2.1)"
-	@for i in $$(seq 1 3) ; do \
-	  $(DOWNLOADER) \
-	    https://github.com/conp-solutions/mergesat/archive/refs/tags/v3.0.tar.gz && \
-	    exit 0 ; \
-		$(RM) v3.0.tar.gz ; \
-	  if [ $$i -lt 3 ] ; then echo "Re-trying in 10 seconds" 1>&2 ; sleep 10 ; fi ; \
-	done ; exit 1
-	@$(TAR) xfz v3.0.tar.gz # will create mergesat-3.0
 	@rm -Rf ../minisat-2.2.1
-	@mv mergesat-3.0 ../minisat-2.2.1
-	@rm v3.0.tar.gz
+	@git clone https://github.com/conp-solutions/mergesat.git ../minisat-2.2.1
+	@sed -i 's:eliminations with growing.", true);:eliminations with growing.", false);:g' ../minisat-2.2.1/minisat/simp/SimpSolver.cc
+	@sed -i 's:use_simplification(true):use_simplification(false):g' ../minisat-2.2.1/minisat/parallel/ParSolver.cc
 
 cudd-download:
 	@echo "Downloading Cudd 3.0.0"
