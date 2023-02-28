@@ -193,8 +193,15 @@ public:
   // Copy from rvalue reference.
   // Note that this does avoid a branch compared to the
   // standard copy constructor above.
+  // Work around spurious GCC 12 warning about irep.data being uninitialized.
+  // See also https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80635
+#pragma GCC diagnostic push
+#ifndef __clang__
+#  pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
   sharing_treet(sharing_treet &&irep) : data(irep.data)
   {
+#pragma GCC diagnostic pop
 #ifdef IREP_DEBUG
     std::cout << "COPY MOVE\n";
 #endif
@@ -233,7 +240,14 @@ public:
 
   ~sharing_treet()
   {
+    // Work around spurious GCC 12 warning about irep.data being uninitialized.
+    // See also https://gcc.gnu.org/bugzilla/show_bug.cgi?id=80635
+#pragma GCC diagnostic push
+#ifndef __clang__
+#  pragma GCC diagnostic ignored "-Wmaybe-uninitialized"
+#endif
     remove_ref(data);
+#pragma GCC diagnostic pop
   }
 
 protected:
