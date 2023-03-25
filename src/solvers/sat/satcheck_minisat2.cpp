@@ -17,8 +17,8 @@ Author: Daniel Kroening, kroening@kroening.com
 #include <util/make_unique.h>
 #include <util/threeval.h>
 
-#include <minisat/core/Solver.h>
-#include <minisat/simp/SimpSolver.h>
+// #include <minisat/core/Solver.h>
+#include <minisat/parallel/ParSolver.h>
 
 #include <cstdlib>
 #include <limits>
@@ -57,9 +57,9 @@ tvt satcheck_minisat2_baset<T>::l_get(literalt a) const
 
   using Minisat::lbool;
 
-  if(solver->model[a.var_no()]==l_True)
+  if(solver->modelValue(a.var_no()===l_True)
     result=tvt(true);
-  else if(solver->model[a.var_no()]==l_False)
+  else if(solver->modelValue(a.var_no())==l_False)
     result=tvt(false);
   else
     return tvt::unknown();
@@ -190,7 +190,7 @@ void satcheck_minisat2_baset<T>::lcnf(const bvt &bv)
 
 #ifndef _WIN32
 
-static Minisat::Solver *solver_to_interrupt=nullptr;
+static Minisat::ParSolver *solver_to_interrupt=nullptr;
 
 static void interrupt_solver(int signum)
 {
@@ -322,6 +322,7 @@ void satcheck_minisat2_baset<T>::set_assignment(literalt a, bool value)
     solver->model.growTo(v + 1);
     value ^= sign;
     solver->model[v] = Minisat::lbool(value);
+    raise "Not sure why we need to operate on the solver internal data structure here.";
   }
   catch(const Minisat::OutOfMemoryException &)
   {
@@ -341,10 +342,7 @@ satcheck_minisat2_baset<T>::satcheck_minisat2_baset(
 #ifdef HAVE_MERGESAT
   if constexpr(std::is_same<T, Minisat::SimpSolver>::value)
   {
-    solver->grow_iterations = false;
-    // limit the amount of work spent in simplification; the optimal value needs
-    // to be found via benchmarking
-    solver->nr_max_simp_cls = 1000000;
+    solver->set_configuration("cbmc");
   }
 #endif
 }
@@ -379,8 +377,7 @@ void satcheck_minisat2_baset<T>::set_assumptions(const bvt &bv)
   }
 }
 
-template class satcheck_minisat2_baset<Minisat::Solver>;
-template class satcheck_minisat2_baset<Minisat::SimpSolver>;
+template class satcheck_minisat2_baset<Minisat::ParSolver>;
 
 void satcheck_minisat_simplifiert::set_frozen(literalt a)
 {

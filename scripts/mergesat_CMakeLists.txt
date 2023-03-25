@@ -5,6 +5,7 @@ add_library(mergesat-condensed
     minisat/core/Lookahead.cc
     minisat/core/Solver.cc
     minisat/simp/SimpSolver.cc
+    minisat/parallel/ParSolver.cc
     minisat/utils/ccnr.cc
     minisat/utils/Options.cc
     minisat/utils/System.cc
